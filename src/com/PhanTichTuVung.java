@@ -23,14 +23,13 @@ public class PhanTichTuVung {
                                                         77,80,84,86,90,92,94,95}; //35
     private static int endWithStarStates[] = new int []{13,21,25,30,54,58,61,64,67,71,75,
                                                         78,81,85,87,91,93,103,105,109,112,
-                                                        113,115,119,120,124,125,127,128,201,500}; //31
+                                                        113,115,119,120,124,125,127,128,130,132,201,500}; //31
     public PhanTichTuVung(){
 
     }
     public static void main(String[] args) throws IOException {
         Path path = Path.of("D:\\TaiLieu\\ChuongTrinhDich\\PhanTichTuVung\\src\\com\\input.txt");
         String input = Files.readString(path);
-        System.out.println(input);
         while (input.indexOf(13)>0)
             input = input.substring(0,input.indexOf(13))+input.substring(input.indexOf(13)+1);
         System.out.println(input);
@@ -48,9 +47,10 @@ public class PhanTichTuVung {
         allTokens = "";
         allAttributes = "";
         int state = 0;
+        int errorPosition = -1;
         for (int i = 0;i<input.length();i++){
             char currentChar = input.charAt(i);
-            System.out.println("state: "+state+" - next char is: "+ currentChar);
+//            System.out.println("state: "+state+" - next char is: "+ currentChar);
             switch(state) {
                 //nhanh toan tu
                 //
@@ -116,7 +116,10 @@ public class PhanTichTuVung {
                     }
                     break;
                 case 12:
-                    if (currentChar == '\n' || currentChar == '\0') state = 13;
+                    if (currentChar == '\n' || currentChar == '\0') {
+                        errorPosition = i;
+                        state = 13;
+                    }
                     else if (currentChar == '"') state = 14;
                     else if (currentChar == '\\') state = 15;
                     break;
@@ -129,11 +132,13 @@ public class PhanTichTuVung {
                         case '\n':
                         case '\0':
                             state = 21;
+                            errorPosition = i;
                             break;
                         case '\\':
                             state = 17;
                             break;
                         case '\'':
+                            errorPosition = i;
                             state = 22;
                             break;
                         default:
@@ -225,6 +230,7 @@ public class PhanTichTuVung {
                         case '@':
                         case '$':
                         case '`':
+                            errorPosition = i;
                             state = 95;
                             break;
                         default:
@@ -320,14 +326,23 @@ public class PhanTichTuVung {
                     else if (currentChar=='b'||currentChar=='B') state = 121;
                     else if (currentChar=='.') state = 110;
                     else if (currentChar=='8'||currentChar=='9') state = 106;
-                    else if (Character.isLetter(currentChar)) state = 104;
+                    else if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
+                        state = 104;
+                    }
                     else if (currentChar <= '7' && currentChar >= '0') state = 102;
-                    else state = 129;
+                    else state = 128;
                     break;
                 case 102:
                     if (currentChar == '.') state = 110;
-                    else if (Character.isLetter(currentChar)) state = 104;
-                    else if (currentChar == '8' || currentChar == '9') state = 106;
+                    else if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
+                        state = 104;
+                    }
+                    else if (currentChar == '8' || currentChar == '9') {
+                        errorPosition = i;
+                        state = 106;
+                    }
                     else if (currentChar > '7' || currentChar < '0') state = 103;
                     break;
                 case 104:
@@ -342,14 +357,23 @@ public class PhanTichTuVung {
                     if (!Character.isLetterOrDigit(currentChar)) state = 109;
                     break;
                 case 110:
-                    if (Character.isLetter(currentChar)) state = 111;
+                    if (currentChar=='e') state = 129;
+                    else if (currentChar=='f') state = 131;
+                    else if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
+                        state = 111;
+                    }
                     else if(currentChar > '9' || currentChar < '0') state = 113;
                     break;
                 case 111:
                     if (!Character.isLetterOrDigit(currentChar)) state = 112;
                     break;
                 case 114:
-                    if (Character.isLetter(currentChar)) state = 104;
+                    if (currentChar=='e') state = 129;
+                    else if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
+                        state = 104;
+                    }
                     else if (currentChar=='.') state = 110;
                     else if (currentChar > '9' || currentChar < '0') state = 115;
                     break;
@@ -358,14 +382,21 @@ public class PhanTichTuVung {
                             (currentChar<='f'&&currentChar>='a')||
                             (currentChar<='F'&&currentChar>='A'))
                         state = 117;
-                    else if (Character.isLetter(currentChar))
+                    else if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
                         state = 104;
-                    else state = 105;
+                    }
+                    else {
+                        errorPosition = i;
+                        state = 105;
+                    }
                     break;
                 case 117:
                     if ((currentChar<='z'&&currentChar>='g')||
-                            (currentChar<='Z'&&currentChar>='G'))
+                            (currentChar<='Z'&&currentChar>='G')) {
+                        errorPosition = i;
                         state = 118;
+                    }
                     else if (!(Character.isLetterOrDigit(currentChar)))
                         state = 120;
                     break;
@@ -374,12 +405,21 @@ public class PhanTichTuVung {
                     break;
                 case 121:
                     if (currentChar=='0'||currentChar=='1') state = 122;
-                    else if(Character.isLetterOrDigit(currentChar)) state =104;
-                    else state = 105;
+                    else if(Character.isLetterOrDigit(currentChar)) {
+                        errorPosition = i;
+                        state =104;
+                    }
+                    else {
+                        errorPosition = i;
+                        state = 105;
+                    }
                     break;
                 case 122:
                     if (currentChar!='0' && currentChar!='1'){
-                        if (Character.isLetterOrDigit(currentChar)) state = 123;
+                        if (Character.isLetterOrDigit(currentChar)) {
+                            errorPosition = i;
+                            state = 123;
+                        }
                         else state = 125;
                     }
                     break;
@@ -389,6 +429,20 @@ public class PhanTichTuVung {
                 case 126:
                     if(Character.isDigit(currentChar)) state = 110;
                     else state = 127;
+                    break;
+                case 129:
+                    if (Character.isLetter(currentChar)) {
+                        errorPosition = i;
+                        state = 111;
+                    }
+                    else if (!Character.isDigit(currentChar)) state = 130;
+                    break;
+                case 131:
+                    if (Character.isLetterOrDigit(currentChar)){
+                        errorPosition = i;
+                        state = 111;
+                    }
+                    else state = 132;
                     break;
                 //nhanh keyword, identified
                 //
@@ -1067,13 +1121,18 @@ public class PhanTichTuVung {
             else if (isEndWithoutStar(state)){
                 currentToken += currentChar;
                 allTokens +=" "+currentToken;
-                allAttributes += " "+getAttribute(state);
+                allAttributes+=" "+getAttribute(state);
                 state = 0;
                 currentToken = "";
             }
             else if (isEndWithStar(state)){
                 allTokens +=" "+currentToken;
-                allAttributes += " "+getAttribute(state);
+                String currentAttribute = getAttribute(state);
+                if (currentAttribute.startsWith("error")){
+                    currentAttribute = "at-position-"+errorPosition+"-"+currentAttribute;
+                }
+                else if (currentAttribute.equals("keyword")) currentAttribute = currentToken;
+                allAttributes += " "+currentAttribute;
                 i--;
                 state = 0;
                 currentToken = "";
@@ -1112,11 +1171,11 @@ public class PhanTichTuVung {
             case 9: attribute = "colon"; break;
             case 10: attribute = "comma"; break;
             case 11: attribute = "semicolon"; break;
-            case 13: attribute = "missing-\"-terminate"; break;
+            case 13: attribute = "error-missing-\"-terminate"; break;
             case 14: attribute = "string-constant"; break;
             case 20: attribute = "char-constant"; break;
-            case 21: attribute = "error: missing-\'-terminate"; break;
-            case 22: attribute = "error: empty-char"; break;
+            case 21: attribute = "error-missing-\'-terminate"; break;
+            case 22: attribute = "error-empty-char"; break;
             case 25: attribute = "one-line-cmt"; break;
             case 28: attribute = "multi-line-cmt"; break;
             case 29: attribute = "divide-assign"; break;
@@ -1152,19 +1211,21 @@ public class PhanTichTuVung {
             case 92: attribute = "less-than-or-equal"; break;
             case 93: attribute = "less-than"; break;
             case 94: attribute = "not-bitwise"; break;
-            case 95: attribute = "error: unknown-char"; break;
+            case 95: attribute = "error-unknown-char"; break;
             case 103: attribute = "octal-int"; break;
-            case 105: attribute = "error: invalid-int-constant"; break;
-            case 109: attribute = "error: invalid-octal-int"; break;
-            case 112: attribute = "error: invalid-float-constant"; break;
+            case 105: attribute = "error-invalid-int-constant"; break;
+            case 109: attribute = "error-invalid-octal-int"; break;
+            case 112: attribute = "error-invalid-float-constant"; break;
+            case 132:
             case 113: attribute = "float-constant"; break;
             case 115: attribute = "int-constant"; break;
-            case 119: attribute = "error: invalid-hexa-int"; break;
+            case 119: attribute = "error-invalid-hexa-int"; break;
             case 120: attribute = "hexa-int"; break;
-            case 124: attribute = "error: invalid-binary-int"; break;
+            case 124: attribute = "error-invalid-binary-int"; break;
             case 125: attribute = "binary-int"; break;
             case 127: attribute = "dots"; break;
             case 128: attribute = "number-0"; break;
+            case 130: attribute = "floating-point-constant"; break;
             case 201: attribute = "identifier"; break;
             case 500: attribute = "keyword"; break;
         }
