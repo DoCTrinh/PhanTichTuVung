@@ -12,6 +12,7 @@ public class PhanTichTuVung {
     private static String currentToken ="";
     private static String allTokens = "";
     private static String allAttributes = "";
+    private static List<TokenAttribute> listTkAtt = new ArrayList<>();
     private static Map<Integer, Integer> startBrandIndexList = new HashMap<Integer,Integer>(){{
         put(0,50);
         put(50,100);
@@ -23,7 +24,7 @@ public class PhanTichTuVung {
                                                         77,80,84,86,90,92,94,95}; //35
     private static int endWithStarStates[] = new int []{13,21,25,30,54,58,61,64,67,71,75,
                                                         78,81,85,87,91,93,103,105,109,112,
-                                                        113,115,119,120,124,125,127,128,130,132,201,500}; //31
+                                                        113,115,119,120,124,125,127,128,130,132,201,500}; //33
     public PhanTichTuVung(){
 
     }
@@ -1121,7 +1122,13 @@ public class PhanTichTuVung {
             else if (isEndWithoutStar(state)){
                 currentToken += currentChar;
                 allTokens +=" "+currentToken;
-                allAttributes+=" "+getAttribute(state);
+                String currentAttribute = getAttribute(state);
+                if (currentAttribute.startsWith("error")){
+                    currentAttribute = "at-position-"+errorPosition+"-"+currentAttribute;
+                }
+                else if (currentAttribute.equals("keyword")) currentAttribute = currentToken;
+                allAttributes += " "+currentAttribute;
+                listTkAtt.add(new TokenAttribute(currentToken,currentAttribute));
                 state = 0;
                 currentToken = "";
             }
@@ -1133,6 +1140,7 @@ public class PhanTichTuVung {
                 }
                 else if (currentAttribute.equals("keyword")) currentAttribute = currentToken;
                 allAttributes += " "+currentAttribute;
+                listTkAtt.add(new TokenAttribute(currentToken,currentAttribute));
                 i--;
                 state = 0;
                 currentToken = "";
