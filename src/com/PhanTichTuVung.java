@@ -347,7 +347,7 @@ public class PhanTichTuVung {
                     else if (currentChar > '7' || currentChar < '0') state = 103;
                     break;
                 case 104:
-                    if (!Character.isLetterOrDigit(currentChar)) state = 105;
+                    if (!Character.isLetterOrDigit(currentChar)&&currentChar!='.') state = 105;
                     break;
                 case 106:
                     if (currentChar=='.') state = 110;
@@ -358,16 +358,16 @@ public class PhanTichTuVung {
                     if (!Character.isLetterOrDigit(currentChar)) state = 109;
                     break;
                 case 110:
-                    if (currentChar=='e') state = 129;
-                    else if (currentChar=='f') state = 131;
-                    else if (Character.isLetter(currentChar)) {
+                    if (currentChar=='e'||currentChar=='E') state = 129;
+                    else if (currentChar=='f'||currentChar=='F') state = 131;
+                    else if (Character.isLetter(currentChar)||currentChar=='.') {
                         errorPosition = i;
                         state = 111;
                     }
                     else if(currentChar > '9' || currentChar < '0') state = 113;
                     break;
                 case 111:
-                    if (!Character.isLetterOrDigit(currentChar)) state = 112;
+                    if (!Character.isLetterOrDigit(currentChar)&&currentChar!='.') state = 112;
                     break;
                 case 114:
                     if (currentChar=='e') state = 129;
@@ -432,14 +432,14 @@ public class PhanTichTuVung {
                     else state = 127;
                     break;
                 case 129:
-                    if (Character.isLetter(currentChar)) {
+                    if (Character.isLetter(currentChar)||currentChar=='.') {
                         errorPosition = i;
                         state = 111;
                     }
                     else if (!Character.isDigit(currentChar)) state = 130;
                     break;
                 case 131:
-                    if (Character.isLetterOrDigit(currentChar)){
+                    if (Character.isLetterOrDigit(currentChar)||currentChar=='.'){
                         errorPosition = i;
                         state = 111;
                     }
